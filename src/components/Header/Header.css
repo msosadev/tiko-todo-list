@@ -1,0 +1,10 @@
+.main-header {
+    background-color: var(--header-background);
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+}
+
+.main-header img {
+    width: 70px;
+}
