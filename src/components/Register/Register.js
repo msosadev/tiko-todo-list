@@ -9,14 +9,29 @@ export default function Register() {
     const [lastName, setLastName]= useState("");
 
     function submitHandler() {
-        const item = {
+        const data = {
             "email": email, 
             "password": password, 
             "password2": password2, 
-            "first-name": firstName,
-            "last-name": lastName
+            "first_name": firstName,
+            "last_name": lastName
         }
-        console.log(item);
+
+        // Make a POST request to the registration endpoint
+        fetch('https://todos-api.public.tiko.energy/api/register/', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json())
+        .then(result => {
+            console.log(result);
+        })
+        .catch(error => {
+            console.error('Error during registration:', error);
+        });
     }
 
     return (
