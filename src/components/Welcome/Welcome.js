@@ -28,7 +28,7 @@ export default function Welcome() {
 
   return (
     <div className="welcome">
-      <h1>Tiko ToDo List</h1>
+      <h1>tiko ToDo List</h1>
       {accessToken ? <LoggedWelcome /> : <NewWelcome />}
     </div>
   );

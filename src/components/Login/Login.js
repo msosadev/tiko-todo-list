@@ -13,13 +13,6 @@ export default function Login() {
       password: password,
     };
 
-    // function setCookie(name, value, expirationDays) {
-    //     const date = new Date();
-    //     date.setTime(date.getTime() + (expirationDays * 24 * 60 * 60 * 1000));
-    //     const expires = "expires=" + date.toUTCString();
-    //     document.cookie = name + "=" + value + ";" + expires + ";path=/;Secure;HttpOnly";
-    // }
-
     // Make a POST request to the login endpoint
     fetch("https://todos-api.public.tiko.energy/api/login/", {
       method: "POST",
@@ -39,8 +32,6 @@ export default function Login() {
           localStorage.setItem("refresh_token", refreshToken);
           navigate("/todo");
         }
-        // setCookie('access_token', accessToken, 1);
-        // setCookie('refresh_token', refreshToken, 7);
       })
       .catch((error) => {
         console.error("Error during login:", error);
