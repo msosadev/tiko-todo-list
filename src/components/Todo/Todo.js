@@ -66,7 +66,7 @@ export default function Todo() {
       </header>
       <div className="todo-list">
         {todoList && todoList.toReversed().map((todo) => (
-          <TodoItem id={todo.id} key={todo.id} description={todo.description} />
+          <TodoItem done={todo.done} id={todo.id} key={todo.id} description={todo.description} />
         ))}
       </div>
     </div>
