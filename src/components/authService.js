@@ -1,4 +1,4 @@
-const refreshAccessToken = async () => {
+export const refreshAccessToken = async () => {
   const api = "https://todos-api.public.tiko.energy/api/token/refresh/";
   const refreshToken = localStorage.getItem("refresh_token");
   const data = {
@@ -23,12 +23,12 @@ const refreshAccessToken = async () => {
   }
 };
 
-const applyTokens = (accessToken, refreshToken) => {
+export const applyTokens = (accessToken, refreshToken) => {
   accessToken && localStorage.setItem("access_token", accessToken);
   refreshToken && localStorage.setItem("refresh_token", refreshToken);
 };
 
-const verifyAccessToken = async () => {
+export const verifyAccessToken = async () => {
   const api = "https://todos-api.public.tiko.energy/api/token/verify/";
   const accessToken = localStorage.getItem("access_token");
   const data = { token: accessToken };
@@ -60,7 +60,7 @@ const verifyAccessToken = async () => {
   }
 };
 
-const verifyRefreshToken = async () => {
+export const verifyRefreshToken = async () => {
   const api = "https://todos-api.public.tiko.energy/api/token/verify/";
   const refreshToken = localStorage.getItem("refresh_token");
   const data = { token: refreshToken };
@@ -92,9 +92,27 @@ const verifyRefreshToken = async () => {
   }
 };
 
-function logOut() {
+// Removes tokens from local storage
+export function logOut() {
   localStorage.removeItem("access_token");
   localStorage.removeItem("refresh_token");
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
 }
 
-export { verifyAccessToken, verifyRefreshToken, refreshAccessToken, logOut };
+// Set a value in local storage with a timestamp
+export function setValueWithTimestamp(key, value) {
+  // Store the current timestamp
+  const timestamp = new Date().toISOString();
+  localStorage.setItem(key, JSON.stringify({ value, timestamp }));
+}
+
+// Get the value and timestamp from local storage
+export function getValueWithTimestamp(key) {
+  const storedValue = localStorage.getItem(key);
+  if (storedValue) {
+      const { value, timestamp } = JSON.parse(storedValue);
+      return { value, timestamp };
+  }
+  return "null";
+}

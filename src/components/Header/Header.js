@@ -2,10 +2,12 @@ import "./Header.css";
 import logoTiko from "../../img/logo_tiko.svg";
 import { useNavigate } from "react-router-dom";
 import { logOut } from "../authService";
+import { useContext } from "react";
+import { LocalAccessToken } from "../tokenContext";
 
 export default function Header() {
   const navigate = useNavigate();
-  const accessToken = localStorage.getItem("access_token");
+  const accessToken = useContext(LocalAccessToken);
   function clickLogOut() {
     logOut();
     navigate("/");

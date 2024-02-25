@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./Login.css";
 import { useNavigate } from "react-router-dom";
+import { setValueWithTimestamp } from "../authService";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -23,13 +24,12 @@ export default function Login() {
     })
       .then((response) => response.json())
       .then((result) => {
-        console.log(result);
         const accessToken = result.access;
         const refreshToken = result.refresh;
 
         if (accessToken && refreshToken) {
-          localStorage.setItem("access_token", accessToken);
-          localStorage.setItem("refresh_token", refreshToken);
+          setValueWithTimestamp("accessToken", accessToken);
+          setValueWithTimestamp("refreshToken", refreshToken);
           navigate("/todo");
         }
       })

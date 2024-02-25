@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { LocalAccessToken } from "../tokenContext";
 
 export default function TodoItem(props) {
   const [done, setDone] = useState(props.done);
-  const accessToken = localStorage.getItem("access_token");
+  const accessToken = useContext(LocalAccessToken);
 
-  const checkHandler = async (e) => {
+  const checkHandler = async () => {
     const api = `https://todos-api.public.tiko.energy/api/todos/${props.id}`;
     const data = {
       description: `${props.description}`,
@@ -21,7 +22,7 @@ export default function TodoItem(props) {
         body: JSON.stringify(data),
       });
     } catch (error) {
-      console.error("Error creating to-do:", error);
+      console.error("Error checking to-do:", error);
     }
 
     setDone(!done);

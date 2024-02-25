@@ -5,9 +5,22 @@ import Register from "./components/Register/Register";
 import Todo from "./components/Todo/Todo";
 import Welcome from "./components/Welcome/Welcome";
 import Home from "./components/Home/Home";
+// import { verifyAccessToken } from "./components/authService";
+import { useContext } from "react";
+import { LocalAccessToken } from "./components/tokenContext";
 
 function App() {
-  const accessToken = localStorage.getItem("access_token");
+  const localAccessToken = useContext(LocalAccessToken);
+  // let accessToken;
+  // async function checkAccessToken() {
+  //   const accessTokenSuccess = await verifyAccessToken();
+  //   accessToken = accessTokenSuccess;
+  //   console.log(accessToken, accessTokenSuccess);
+  // }
+
+  // useEffect(() => {
+  //   checkAccessToken();
+  // }, []);
 
   return (
     <div className="App">
@@ -19,7 +32,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route
               path="/todo"
-              element={accessToken ? <Todo /> : <Navigate to="/register" />}
+              element={localAccessToken ? <Todo /> : <Navigate to="/register" />}
             />
           </Route>
         </Routes>

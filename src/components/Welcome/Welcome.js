@@ -1,14 +1,28 @@
+import { useContext } from "react";
+import { setValueWithTimestamp } from "../authService";
 import "./Welcome.css";
 import { useNavigate } from "react-router-dom";
+import { LocalAccessToken, LocalRefreshToken } from "../tokenContext";
 
 export default function Welcome() {
   const navigate = useNavigate();
-  const accessToken = localStorage.getItem("access_token");
+  const accessToken = useContext(LocalAccessToken);
+  const localAccessToken = useContext(LocalAccessToken);
+  const localRefreshToken = useContext(LocalRefreshToken);
+
+  function logTokens() {
+    console.log(localAccessToken, localRefreshToken);
+  }
+
+  function setTokens() {
+    setValueWithTimestamp("accessToken", "1234");
+    setValueWithTimestamp("refreshToken", "5678");
+  }
 
   function LoggedWelcome() {
     return (
       <>
-        <p>Access your to-do list with the button below.</p>
+        <p onClick={setTokens}>Access your to-do list with the button below.</p>
         <button onClick={() => navigate("/todo")}>To-do List</button>
       </>
     );
@@ -28,7 +42,7 @@ export default function Welcome() {
 
   return (
     <div className="welcome">
-      <h1>tiko ToDo List</h1>
+      <h1 onClick={logTokens}>tiko ToDo List</h1>
       {accessToken ? <LoggedWelcome /> : <NewWelcome />}
     </div>
   );

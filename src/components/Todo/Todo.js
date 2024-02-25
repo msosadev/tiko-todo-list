@@ -1,11 +1,12 @@
 import TodoItem from "./TodoItem";
 import "./Todo.css";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { LocalAccessToken } from "../tokenContext";
 
 export default function Todo() {
   const [description, setDescription] = useState("");
-  const accessToken = localStorage.getItem("access_token");
   const [todoList, setTodoList] = useState();
+  const accessToken = useContext(LocalAccessToken);
   const api = "https://todos-api.public.tiko.energy/api/todos/";
 
   function fetchTodos() {
@@ -13,7 +14,7 @@ export default function Todo() {
       method: "GET",
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json", // Adjust the content type as needed
+        "Content-Type": "application/json",
       },
     })
       .then((response) => response.json())
