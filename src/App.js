@@ -5,7 +5,6 @@ import Register from "./components/Register/Register";
 import Todo from "./components/Todo/Todo";
 import Welcome from "./components/Welcome/Welcome";
 import Home from "./components/Home/Home";
-// import { verifyAccessToken } from "./components/authService";
 import { useEffect, useState } from "react";
 import { TokenContext } from "./components/tokenContext";
 import {
@@ -18,6 +17,7 @@ function App() {
   const localAccessToken = getValueWithTimestamp("accessToken").value || null;
   const localRefreshToken = getValueWithTimestamp("refreshToken").value || null;
 
+  // Changes the access token while leaving the refresh token as is
   const setAccessToken = (token) => {
     setTokenState((prevState) => ({
       ...prevState,
@@ -27,6 +27,7 @@ function App() {
     setValueWithTimestamp("accessToken", token);
   };
 
+  // Changes the refresh token while leaving the access token as is
   const setRefreshToken = (token) => {
     setTokenState((prevState) => ({
       ...prevState,
@@ -36,18 +37,40 @@ function App() {
     setValueWithTimestamp("refreshToken", token);
   };
 
+  // Setting a global tokenState
   const [tokenState, setTokenState] = useState({
     access: localAccessToken,
     refresh: localRefreshToken,
   });
 
+  // value is passed to tokenContext provider to make it available to children components
   const value = { tokenState, setAccessToken, setRefreshToken };
 
-  // Token verification and refreshing on load
+  // ----- Token verification and refreshing on load ----- //
 
+  // Accepts "accessToken" or "refreshToken", calculates the remaining lifespan of a token based on when the timestamp was set on local storage
+  function calculateTokenLifetime(token) {
+    const timestamp = getValueWithTimestamp(token).timestamp;
+    let expirationTime;
+    if (token === "acessToken") {
+      expirationTime = new Date(timestamp).getTime() + 3600000; // The access token has a lifetime of 1 hour, written in milliseconds
+    } else {
+      expirationTime = new Date(timestamp).getTime() + 86400000; // The refresh token has a lifetime of 1 day, written in milliseconds
+    }
+    const currentTime = new Date().getTime();
+    return expirationTime - currentTime; // Returns the remaining lifespan of a token in milliseconds
+  }
+
+  function logOut(message) {
+    console.log(message);
+    setAccessToken(null);
+    setRefreshToken(null);
+  }
+
+  // Makes an api request to verify the accessToken, returns true or false
   const verifyAccessToken = async () => {
     const api = "https://todos-api.public.tiko.energy/api/token/verify/";
-    const accessToken = tokenState.access;
+    const accessToken = getValueWithTimestamp("accessToken").value;
     const data = { token: accessToken };
 
     if (accessToken !== null) {
@@ -76,6 +99,7 @@ function App() {
     }
   };
 
+  // Makes an api call to refresh the access token
   const refreshAccessToken = async () => {
     const api = "https://todos-api.public.tiko.energy/api/token/refresh/";
     const refreshToken = tokenState.refresh;
@@ -84,58 +108,62 @@ function App() {
     };
 
     if (refreshToken !== null) {
-      fetch(api, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      })
-        .then((response) => response.json())
-        .then((result) => {
-          setAccessToken(result.access);
-        })
-        .catch((error) => {
-          console.error("Error during refresh:", error);
+      try {
+        const response = await fetch(api, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
         });
+
+        if (response.ok) {
+          const result = await response.json();
+          setAccessToken(result.access); // Token successfully refreshed
+          setupAccessRefresh(); // Trigger setupAccessRefresh only if the API call was successful
+        } else {
+          console.error(
+            "Error during refresh. Server returned an error:",
+            response.status
+          );
+          logOut("Unable to refresh token, login out.") // If the access token fails, the user gets logged out
+        }
+      } catch (error) {
+        console.error("Error during refresh:", error);
+      }
     }
 
-    setupAccessRefresh();
+    // This function allows continuously refreshing the access token as long as the refresh token is valid
   };
 
-  function calculateTokenLifetime(token) {
-    const timestamp = getValueWithTimestamp(token).timestamp;
-    let expirationTime;
-    if (token === "acessToken") {
-      expirationTime = new Date(timestamp).getTime() + 3600000; // 1 hour in milliseconds
-    } else {
-      expirationTime = new Date(timestamp).getTime() + 86400000; // 1 hour in milliseconds
-    }
-    const currentTime = new Date().getTime();
-    return expirationTime - currentTime;
-  }
-
+  // Sets up a timeOut based on the remaining lifespan of the accessToken
   async function setupAccessRefresh() {
     const accessTokenSuccess = await verifyAccessToken();
 
+    // We first check if the accessToken exists to avoid errors
     if (tokenState.access) {
+      // If the access token isn't valid, it gets refreshed
       if (!accessTokenSuccess) {
-        refreshAccessToken();
+        await refreshAccessToken();
       } else {
+        // If it is valid, we call calculateTokenLifetime() and set a timeOut
         const timeToExpiration = calculateTokenLifetime("accessToken");
         const refreshThreshold = 1 * 60 * 1000; // 1 minute in milliseconds
 
         // Set up a timer to refresh the token before it expires
         if (timeToExpiration > refreshThreshold) {
-          setTimeout(() => {
-            console.log("Refreshing token before expiration...");
-            refreshAccessToken();
-          }, timeToExpiration - refreshThreshold);
+          await new Promise((resolve) =>
+            setTimeout(resolve, timeToExpiration - refreshThreshold)
+          );
+
+          console.log("Refreshing token before expiration...");
+          await refreshAccessToken();
         }
       }
     }
   }
 
+  // Same as setupAccessRefresh(), it calculates how much time is left in the refreshToken but deletes it if it's expired
   async function setupRefreshTokenLifetime() {
     const timeToExpiration = calculateTokenLifetime("refreshToken");
     const refreshThreshold = 1 * 60 * 1000; // 1 minute in milliseconds
@@ -143,9 +171,7 @@ function App() {
     // Set up a timer to refresh the token before it expires
     if (timeToExpiration > refreshThreshold) {
       setTimeout(() => {
-        console.log("Refresh token expired, login out");
-        setAccessToken(null);
-        setRefreshToken(null);
+        logOut("Refresh token expired, login out");
       }, timeToExpiration - refreshThreshold);
     }
   }

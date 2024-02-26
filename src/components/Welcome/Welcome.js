@@ -5,15 +5,7 @@ import { TokenContext } from "../tokenContext";
 
 export default function Welcome() {
   const navigate = useNavigate();
-  const { tokenState, setAccessToken, setRefreshToken } = useContext(TokenContext);
-
-  function accessHandler() {
-    setAccessToken("i have been accessed");
-  }
-
-  function refreshHandler() {
-    setRefreshToken("i have been refreshed");
-  }
+  const { tokenState } = useContext(TokenContext);
 
   function LoggedWelcome() {
     return (
@@ -38,9 +30,9 @@ export default function Welcome() {
 
   return (
     <div className="welcome">
-      <p onClick={refreshHandler}>Refresh token: {tokenState.refresh}</p>
-      <p onClick={accessHandler}>Access token: {tokenState.access}</p>
       <h1>tiko To-do List</h1>
+
+      {/* Shows a different screen depending on if the user is logged in or not */}
       {tokenState.access ? <LoggedWelcome /> : <NewWelcome />}
     </div>
   );

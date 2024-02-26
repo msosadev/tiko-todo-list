@@ -2,10 +2,12 @@ import { useContext, useState } from "react";
 import { TokenContext } from "../tokenContext";
 
 export default function TodoItem(props) {
+  // The done property is passed though props whenever the to-do list is fetched, it is then stored in a state "done, setDone" to be modified
   const [done, setDone] = useState(props.done);
   const { tokenState } = useContext(TokenContext);
   const accessToken = tokenState.access;
 
+  // It sends an api request to update the todo checked and also updates the done state
   const checkHandler = async () => {
     const api = `https://todos-api.public.tiko.energy/api/todos/${props.id}`;
     const data = {
@@ -25,7 +27,7 @@ export default function TodoItem(props) {
     } catch (error) {
       console.error("Error checking to-do:", error);
     }
-
+    // If the api call is successful, update the done state
     setDone(!done);
   };
   return (

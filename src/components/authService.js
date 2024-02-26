@@ -1,33 +1,3 @@
-// export const refreshAccessToken = async () => {
-//   const api = "https://todos-api.public.tiko.energy/api/token/refresh/";
-//   const refreshToken = localStorage.getItem("refreshToken");
-//   const data = {
-//     refresh: refreshToken,
-//   };
-
-//   if (refreshToken !== null) {
-//     fetch(api, {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify(data),
-//     })
-//       .then((response) => response.json())
-//       .then((result) => {
-//         applyTokens(result.access);
-//       })
-//       .catch((error) => {
-//         console.error("Error during refresh:", error);
-//       });
-//   }
-// };
-
-export const applyTokens = (accessToken, refreshToken) => {
-  accessToken && localStorage.setItem("access_token", accessToken);
-  refreshToken && localStorage.setItem("refresh_token", refreshToken);
-};
-
 // Set a value in local storage with a timestamp
 export function setValueWithTimestamp(key, value) {
   // Store the current timestamp
@@ -42,5 +12,37 @@ export function getValueWithTimestamp(key) {
     const { value, timestamp } = JSON.parse(storedValue);
     return { value, timestamp };
   }
-  return "null";
+  return "null"; // It doesn't work if null is returned, it's necessarry to return a string 
 }
+
+// Makes an api request to verify the accessToken, returns true or false
+export const verifyAccessToken = async () => {
+  const api = "https://todos-api.public.tiko.energy/api/token/verify/";
+  const accessToken = getValueWithTimestamp("accessToken").value;
+  const data = { token: accessToken };
+
+  if (accessToken !== null) {
+    try {
+      const response = await fetch(api, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        return true; // Successfully verified the token
+      } else {
+        console.error(
+          "Error verifying token. Server returned an error:",
+          response.status
+        );
+        return false; // Failed to verify the token
+      }
+    } catch (error) {
+      console.error("Error verifying token:", error);
+      return false; // Failed to verify the token
+    }
+  }
+};
