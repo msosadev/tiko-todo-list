@@ -1,9 +1,10 @@
 import { useContext, useState } from "react";
-import { LocalAccessToken } from "../tokenContext";
+import { TokenContext } from "../tokenContext";
 
 export default function TodoItem(props) {
   const [done, setDone] = useState(props.done);
-  const accessToken = useContext(LocalAccessToken);
+  const { tokenState } = useContext(TokenContext);
+  const accessToken = tokenState.access;
 
   const checkHandler = async () => {
     const api = `https://todos-api.public.tiko.energy/api/todos/${props.id}`;

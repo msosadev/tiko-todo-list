@@ -1,34 +1,41 @@
 import TodoItem from "./TodoItem";
 import "./Todo.css";
 import { useContext, useEffect, useState } from "react";
-import { LocalAccessToken } from "../tokenContext";
+import { TokenContext } from "../tokenContext";
 
 export default function Todo() {
   const [description, setDescription] = useState("");
   const [todoList, setTodoList] = useState();
-  const accessToken = useContext(LocalAccessToken);
+  const [loading, setLoading] = useState(false);
+  const { tokenState } = useContext(TokenContext);
+  const accessToken = tokenState.access;
   const api = "https://todos-api.public.tiko.energy/api/todos/";
 
-  function fetchTodos() {
-    fetch(api, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setTodoList(data);
-      })
-      .catch((error) => console.error("Error:", error));
+  async function fetchTodos() {
+    setLoading(true);
+    try {
+      const response = await fetch(api, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await response.json();
+      setTodoList(data);
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false); // Set loading to false regardless of success or error
+    }
   }
 
   const addTodo = async () => {
     const data = { description };
 
     try {
-      const response = await fetch(api, {
+      await fetch(api, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -37,14 +44,13 @@ export default function Todo() {
         body: JSON.stringify(data),
       });
 
-      const result = await response.json();
-      console.log(result);
-      
-      fetchTodos();
+      // const result = await response.json();
+
+      await fetchTodos(); // Wait for fetchTodos to complete before moving on
     } catch (error) {
       console.error("Error creating to-do:", error);
-    } 
-  }
+    }
+  };
 
   useEffect(() => {
     fetchTodos();
@@ -66,9 +72,19 @@ export default function Todo() {
         </div>
       </header>
       <div className="todo-list">
-        {todoList && todoList.toReversed().map((todo) => (
-          <TodoItem done={todo.done} id={todo.id} key={todo.id} description={todo.description} />
-        ))}
+        {loading
+          ? "Loading"
+          : todoList &&
+            todoList
+              .toReversed()
+              .map((todo) => (
+                <TodoItem
+                  done={todo.done}
+                  id={todo.id}
+                  key={todo.id}
+                  description={todo.description}
+                />
+              ))}
       </div>
     </div>
   );

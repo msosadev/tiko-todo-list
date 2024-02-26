@@ -1,28 +1,24 @@
 import { useContext } from "react";
-import { setValueWithTimestamp } from "../authService";
 import "./Welcome.css";
 import { useNavigate } from "react-router-dom";
-import { LocalAccessToken, LocalRefreshToken } from "../tokenContext";
+import { TokenContext } from "../tokenContext";
 
 export default function Welcome() {
   const navigate = useNavigate();
-  const accessToken = useContext(LocalAccessToken);
-  const localAccessToken = useContext(LocalAccessToken);
-  const localRefreshToken = useContext(LocalRefreshToken);
+  const { tokenState, setAccessToken, setRefreshToken } = useContext(TokenContext);
 
-  function logTokens() {
-    console.log(localAccessToken, localRefreshToken);
+  function accessHandler() {
+    setAccessToken("i have been accessed");
   }
 
-  function setTokens() {
-    setValueWithTimestamp("accessToken", "1234");
-    setValueWithTimestamp("refreshToken", "5678");
+  function refreshHandler() {
+    setRefreshToken("i have been refreshed");
   }
 
   function LoggedWelcome() {
     return (
       <>
-        <p onClick={setTokens}>Access your to-do list with the button below.</p>
+        <p>Access your to-do list with the button below.</p>
         <button onClick={() => navigate("/todo")}>To-do List</button>
       </>
     );
@@ -42,8 +38,10 @@ export default function Welcome() {
 
   return (
     <div className="welcome">
-      <h1 onClick={logTokens}>tiko ToDo List</h1>
-      {accessToken ? <LoggedWelcome /> : <NewWelcome />}
+      <p onClick={refreshHandler}>Refresh token: {tokenState.refresh}</p>
+      <p onClick={accessHandler}>Access token: {tokenState.access}</p>
+      <h1>tiko To-do List</h1>
+      {tokenState.access ? <LoggedWelcome /> : <NewWelcome />}
     </div>
   );
 }

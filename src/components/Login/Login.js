@@ -1,41 +1,49 @@
-import { useState } from "react";
 import "./Login.css";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { setValueWithTimestamp } from "../authService";
+import { TokenContext } from "../tokenContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { setAccessToken, setRefreshToken } = useContext(TokenContext);
 
-  function submitHandler() {
+  async function submitHandler() {
+    setLoading(true);
+
     const data = {
       email: email,
       password: password,
     };
 
-    // Make a POST request to the login endpoint
-    fetch("https://todos-api.public.tiko.energy/api/login/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => response.json())
-      .then((result) => {
-        const accessToken = result.access;
-        const refreshToken = result.refresh;
-
-        if (accessToken && refreshToken) {
-          setValueWithTimestamp("accessToken", accessToken);
-          setValueWithTimestamp("refreshToken", refreshToken);
-          navigate("/todo");
+    try {
+      // Make a POST request to the login endpoint
+      const response = await fetch(
+        "https://todos-api.public.tiko.energy/api/login/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
         }
-      })
-      .catch((error) => {
-        console.error("Error during login:", error);
-      });
+      );
+
+      const result = await response.json();
+      const accessToken = result.access;
+      const refreshToken = result.refresh;
+
+      setAccessToken(accessToken);
+      setRefreshToken(refreshToken);
+
+      if (!loading) {
+        navigate("/todo");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+    }
   }
 
   return (
@@ -61,7 +69,7 @@ export default function Login() {
           placeholder="Password"
         />
         <button type="button" onClick={submitHandler}>
-          Login
+          Login {loading ? "(Loading)" : ""}
         </button>
       </form>
     </div>
