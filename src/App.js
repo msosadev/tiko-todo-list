@@ -147,7 +147,7 @@ function App() {
   return (
     <div className="App">
       <TokenContext.Provider value={value}>
-        <BrowserRouter>
+        <BrowserRouter basename={process.env.PUBLIC_URL}>
           <Routes>
             <Route path="/" element={<Home />}>
               <Route path="/" element={<Welcome />} />
