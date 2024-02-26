@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/tiko-todo-list/static/css/main.d45f2baa.css",
-    "main.js": "/tiko-todo-list/static/js/main.ff6cc72b.js",
+    "main.js": "/tiko-todo-list/static/js/main.3ad47d19.js",
     "static/js/453.50d3c3cd.chunk.js": "/tiko-todo-list/static/js/453.50d3c3cd.chunk.js",
     "static/media/logo_tiko.svg": "/tiko-todo-list/static/media/logo_tiko.d7f80a47c6cdd433e40808ba21e34cb2.svg",
     "index.html": "/tiko-todo-list/index.html",
     "main.d45f2baa.css.map": "/tiko-todo-list/static/css/main.d45f2baa.css.map",
-    "main.ff6cc72b.js.map": "/tiko-todo-list/static/js/main.ff6cc72b.js.map",
+    "main.3ad47d19.js.map": "/tiko-todo-list/static/js/main.3ad47d19.js.map",
     "453.50d3c3cd.chunk.js.map": "/tiko-todo-list/static/js/453.50d3c3cd.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.d45f2baa.css",
-    "static/js/main.ff6cc72b.js"
+    "static/js/main.3ad47d19.js"
   ]
 }
