@@ -30,6 +30,19 @@ button {
   cursor: pointer;
 }
 
+.button {
+  box-sizing: border-box;
+  border: 1px solid var(--primary);
+  background-color: var(--primary);
+  color: #fff;
+  border-radius: 4px;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
 .button-error {
   border: 1px solid var(--error);
   background-color: var(--error);
@@ -51,7 +64,15 @@ input {
 
 /* Applying colors to texts */
 
-p, h1, h2, h3, h4 ,h5, h6, span, label {
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+span,
+label {
   color: var(--text);
 }
 

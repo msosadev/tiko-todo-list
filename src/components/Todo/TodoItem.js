@@ -6,16 +6,15 @@ export default function TodoItem(props) {
   const [done, setDone] = useState(props.done);
   const { tokenState } = useContext(TokenContext);
   const accessToken = tokenState.access;
+  const domain = "https://todos-api.public.tiko.energy";
 
   // It sends an api request to update the todo checked and also updates the done state
   const checkHandler = async () => {
-    const api = `https://todos-api.public.tiko.energy/api/todos/${props.id}`;
+    const api = `${domain}/api/todos/${props.id}`;
     const data = {
       description: `${props.description}`,
       done: !done,
     };
-
-    console.log(data);
 
     try {
       await fetch(api, {

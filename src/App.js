@@ -10,9 +10,12 @@ import { TokenContext } from "./components/tokenContext";
 import {
   getValueWithTimestamp,
   setValueWithTimestamp,
+  verifyAccessToken,
 } from "./components/authService";
 
 function App() {
+  const domain = "https://todos-api.public.tiko.energy";
+
   // Setting tokenContext as state to be able to change the tokens in the children
   const localAccessToken = getValueWithTimestamp("accessToken").value || null;
   const localRefreshToken = getValueWithTimestamp("refreshToken").value || null;
@@ -61,47 +64,14 @@ function App() {
     return expirationTime - currentTime; // Returns the remaining lifespan of a token in milliseconds
   }
 
-  function logOut(message) {
-    console.log(message);
+  function logOut() {
     setAccessToken(null);
     setRefreshToken(null);
   }
 
-  // Makes an api request to verify the accessToken, returns true or false
-  const verifyAccessToken = async () => {
-    const api = "https://todos-api.public.tiko.energy/api/token/verify/";
-    const accessToken = getValueWithTimestamp("accessToken").value;
-    const data = { token: accessToken };
-
-    if (accessToken !== null) {
-      try {
-        const response = await fetch(api, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-
-        if (response.ok) {
-          return true; // Successfully verified the token
-        } else {
-          console.error(
-            "Error verifying token. Server returned an error:",
-            response.status
-          );
-          return false; // Failed to verify the token
-        }
-      } catch (error) {
-        console.error("Error verifying token:", error);
-        return false; // Failed to verify the token
-      }
-    }
-  };
-
   // Makes an api call to refresh the access token
   const refreshAccessToken = async () => {
-    const api = "https://todos-api.public.tiko.energy/api/token/refresh/";
+    const api = `${domain}/api/token/refresh/`;
     const refreshToken = tokenState.refresh;
     const data = {
       refresh: refreshToken,
@@ -122,15 +92,9 @@ function App() {
           setAccessToken(result.access); // Token successfully refreshed
           setupAccessRefresh(); // Trigger setupAccessRefresh only if the API call was successful
         } else {
-          console.error(
-            "Error during refresh. Server returned an error:",
-            response.status
-          );
-          logOut("Unable to refresh token, login out.") // If the access token fails, the user gets logged out
+          logOut(); // If the access token fails, the user gets logged out
         }
-      } catch (error) {
-        console.error("Error during refresh:", error);
-      }
+      } catch (error) {}
     }
 
     // This function allows continuously refreshing the access token as long as the refresh token is valid
@@ -156,7 +120,6 @@ function App() {
             setTimeout(resolve, timeToExpiration - refreshThreshold)
           );
 
-          console.log("Refreshing token before expiration...");
           await refreshAccessToken();
         }
       }
@@ -171,7 +134,7 @@ function App() {
     // Set up a timer to refresh the token before it expires
     if (timeToExpiration > refreshThreshold) {
       setTimeout(() => {
-        logOut("Refresh token expired, login out");
+        logOut();
       }, timeToExpiration - refreshThreshold);
     }
   }

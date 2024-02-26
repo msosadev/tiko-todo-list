@@ -11,7 +11,8 @@ export default function Todo() {
   const [isTokenVerified, setIsTokenVerified] = useState(false);
   const { tokenState } = useContext(TokenContext);
   const accessToken = tokenState.access;
-  const api = "https://todos-api.public.tiko.energy/api/todos/";
+  const domain = "https://todos-api.public.tiko.energy";
+  const api = `${domain}/api/todos/`;
 
   // Makes an api call to fetch the to-do list
   async function fetchTodos() {
@@ -48,8 +49,6 @@ export default function Todo() {
         },
         body: JSON.stringify(data),
       });
-
-      // const result = await response.json();
 
       await fetchTodos(); // Wait for fetchTodos to complete before moving on
     } catch (error) {

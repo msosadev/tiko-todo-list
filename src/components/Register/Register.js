@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "./Register.css";
 import { useNavigate } from "react-router-dom";
+import { postApi } from "../authService";
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -11,7 +12,8 @@ export default function Register() {
   const navigate = useNavigate();
 
   //   Makes an api call to register a new user
-  function submitHandler() {
+  function submitHandler(e) {
+    e.preventDefault();
     const data = {
       email: email,
       password: password,
@@ -20,36 +22,20 @@ export default function Register() {
       last_name: lastName,
     };
 
-    // Make a POST request to the registration endpoint
-    fetch("https://todos-api.public.tiko.energy/api/register/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => {
-        if (response.ok) {
-          // If the response status is OK, proceed with the navigation
-          return response.json();
-        } else {
-          // If the response status is not OK, throw an error
-          throw new Error("Registration failed");
-        }
-      })
+    postApi(data, "register")
       .then(() => {
+        // If the server sends back the tokens, stores them in tokenContext to have them available globally
         alert("Registration successful");
         navigate("/login");
       })
-      .catch((error) => {
+      .catch(() => {
         alert("Error during registration");
-        console.error("Error during registration:", error);
       });
   }
 
   return (
     <div className="register-wrapper">
-      <form className="register">
+      <form onSubmit={submitHandler} className="register">
         <h1>Register</h1>
         <input
           onChange={(e) => setEmail(e.target.value)}
@@ -96,9 +82,7 @@ export default function Register() {
           id="last_name"
           placeholder="Last Name"
         />
-        <button type="button" onClick={submitHandler}>
-          Register
-        </button>
+        <button>Register</button>
       </form>
     </div>
   );

@@ -1,17 +1,17 @@
 import { useContext } from "react";
 import "./Welcome.css";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { TokenContext } from "../tokenContext";
 
 export default function Welcome() {
-  const navigate = useNavigate();
   const { tokenState } = useContext(TokenContext);
 
   function LoggedWelcome() {
     return (
       <>
         <p>Access your to-do list with the button below.</p>
-        <button onClick={() => navigate("/todo")}>To-do List</button>
+        <br></br>
+        <Link className="button" to={"/todo"}>To-do List</Link>
       </>
     );
   }
@@ -19,11 +19,10 @@ export default function Welcome() {
   function NewWelcome() {
     return (
       <>
-        <p>Register up or login to access your To-do list.</p>
-        <button onClick={() => navigate("/login")} className="button-outline">
-          Login
-        </button>
-        <button onClick={() => navigate("/register")}>Register</button>
+        <p>Register or login to access your To-do list.</p>
+        <br></br>
+        <Link className="button button-outline" to={"/login"}>Login</Link>
+        <Link className="button" to={"/register"}>Register</Link>
       </>
     );
   }

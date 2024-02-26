@@ -1,3 +1,5 @@
+const domain = "https://todos-api.public.tiko.energy";
+
 // Set a value in local storage with a timestamp
 export function setValueWithTimestamp(key, value) {
   // Store the current timestamp
@@ -12,14 +14,15 @@ export function getValueWithTimestamp(key) {
     const { value, timestamp } = JSON.parse(storedValue);
     return { value, timestamp };
   }
-  return "null"; // It doesn't work if null is returned, it's necessarry to return a string 
+  return "null"; // It fails if null is returned, it's required to return a string
 }
 
 // Makes an api request to verify the accessToken, returns true or false
 export const verifyAccessToken = async () => {
-  const api = "https://todos-api.public.tiko.energy/api/token/verify/";
-  const accessToken = getValueWithTimestamp("accessToken").value;
-  const data = { token: accessToken };
+  const api = `${domain}/api/token/verify/`;
+  const accessTokenValue = getValueWithTimestamp("accessToken").value;
+  const accessToken = localStorage.getItem("accessToken");
+  const data = { token: accessTokenValue };
 
   if (accessToken !== null) {
     try {
@@ -45,4 +48,22 @@ export const verifyAccessToken = async () => {
       return false; // Failed to verify the token
     }
   }
+};
+
+export const postApi = (data, endpoint) => {
+  const api = `${domain}/api/${endpoint}/`;
+  return fetch(api, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        // Handle non-successful response here
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+      return response.json();
+    })
 };
