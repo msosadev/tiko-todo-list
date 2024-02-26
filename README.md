@@ -7,7 +7,8 @@ This project was created with [Create React App](https://github.com/facebook/cre
 ### To setup the project in dev mode, you can run:
 
 ```
-git pull https://github.com/msosadesign/tiko-todo-list.git
+git clone https://github.com/msosadesign/tiko-todo-list.git
+cd tiko-todo-list
 npm install
 npm start
 ```
@@ -15,7 +16,8 @@ npm start
 ### To setup a build, run:
 
 ```
-git pull https://github.com/msosadesign/tiko-todo-list.git
+git clone https://github.com/msosadesign/tiko-todo-list.git
+cd tiko-todo-list
 npm install
 npm run build
 ```
