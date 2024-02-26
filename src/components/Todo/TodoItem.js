@@ -12,8 +12,10 @@ export default function TodoItem(props) {
     const api = `https://todos-api.public.tiko.energy/api/todos/${props.id}`;
     const data = {
       description: `${props.description}`,
-      done: !props.done,
+      done: !done,
     };
+
+    console.log(data);
 
     try {
       await fetch(api, {
