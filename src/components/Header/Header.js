@@ -22,7 +22,7 @@ export default function Header() {
         {/* Shows logout button if accessToken exists. Technically the token should also be verified but this is handled in App.js where if the accessToken fails to refresh, the user gets logged out */}
         {accessToken ? (
           <button onClick={clickLogOut} className="button-error">
-            Log out
+            Log Out
           </button>
         ) : (
           ""
